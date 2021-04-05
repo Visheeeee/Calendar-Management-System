@@ -19,7 +19,7 @@ print("Table connected successfully")
 conn.close()
 
 
-
+mail_id='v@gmail.com'
 
 
 app = Flask(__name__)
@@ -74,8 +74,9 @@ def signedup():
          with sqlite3.connect("database.db") as con:
             print("inside table")
             cur = con.cursor()
+            print('cur created')
             cur.execute("INSERT INTO users (name,email,password) VALUES (?,?,?)",(nm,mail,pswd))
-            
+            print('insertion')
             con.commit()
             msg = "Record successfully added"
       except:
@@ -84,6 +85,11 @@ def signedup():
       
       finally:
          con.close() 
+         file_path='./events/'+mail+'.json'
+         f = open(file_path, "w+")
+         f.write("[]")
+         f.close()
+            
          return render_template("result.html")
          
 
@@ -107,6 +113,7 @@ def loggedup():
                 cur.execute("SELECT * FROM users WHERE email=? AND password=?", (mail,pswd))
                 rows = cur.fetchall()
                 if len(rows)>=1: 
+                    mail_id=mail
                     return render_template("result_login.html",mail=mail,pswd=pswd)
 
         except:
@@ -147,7 +154,8 @@ def event_added():
                 res['title']=eventname
                 res['start']=startdate
                 res['end']=enddate
-                f=open("events.json","r+")
+                filepath='./events/'+mail_id+'.json'
+                f=open(filepath,"r+")
                 j=json.loads(f.read())
                 f.seek(0)
                 f.truncate()
@@ -186,8 +194,9 @@ def return_data():
     # you don't want to return ALL events like in this code
     # but since no db or any real storage is implemented I'm just
     # returning data from a text file that contains json elements
-
-    with open("events.json", "r") as input_data:
+    filepath='./events/'+mail_id+'.json'
+    print(mail_id)
+    with open(filepath, "r") as input_data:
         # you should use something else here than just plaintext
         # check out jsonfiy method or the built in json module
         # http://flask.pocoo.org/docs/0.10/api/#module-flask.json
