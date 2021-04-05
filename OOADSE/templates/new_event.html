@@ -1,0 +1,43 @@
+{% extends "layout1.html" %}
+
+{% block content %}
+
+
+
+<h2>Form<h2>
+<form action="{{ url_for('event_added')}}" method="post">
+  
+<p>
+  <label for="eventname">Event Name</label>
+  <input type="text" id="eventname" name="eventname">
+</p>
+
+
+
+<p>
+    <label for="startdate">Start Date:</label>
+    <input type="date" id="startdate" name="startdate"> 
+</p>
+
+
+
+<p>
+
+    <label for="enddate">End Date:</label>
+    <input type="date" id="enddate" name="enddate"> 
+</p>
+
+
+
+
+
+
+Optional Description
+
+<div class="form-group shadow-textarea">
+<label for="exampleFormControlTextarea6"></label>
+<textarea class="form-control z-depth-1" id="exampleFormControlTextarea6" rows="10" name=description placeholder="Keywords here..."></textarea>
+</div>
+<button class="btn btn-outline-info" type="submit">Add Event</button>
+
+{% endblock content %}
