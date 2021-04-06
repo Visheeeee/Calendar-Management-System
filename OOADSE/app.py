@@ -112,8 +112,8 @@ def loggedup():
                 cur = con.cursor()
                 cur.execute("SELECT * FROM users WHERE email=? AND password=?", (mail,pswd))
                 rows = cur.fetchall()
-                if len(rows)>=1:
-                    global mail_id 
+                if len(rows)>=1: 
+                    global mail_id
                     mail_id=mail
                     return render_template("result_login.html",mail=mail,pswd=pswd)
 
@@ -141,6 +141,33 @@ def addevent():
     return render_template("new_event.html")
 
 
+
+
+
+@app.route("/deleteevent",methods=['GET','POST'])
+def deleteevent():
+    return render_template("del_event.html")
+
+
+
+
+
+@app.route("/event_deleted",methods=['GET','POST'])
+def event_deleted():
+                eventname = request.form['eventname']
+                print(eventname)
+                filepath='./events/'+mail_id+'.json'
+                f=open(filepath,"r+")
+                j=json.loads(f.read())
+                f.seek(0)
+                f.truncate()
+                print(j)
+                for i in range(len(j)):
+                    if j[i]['title'] == eventname:
+                        del j[i]
+                        break
+                json.dump(j,f)
+                return "sucess"
 
 
 
