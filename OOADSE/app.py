@@ -112,7 +112,8 @@ def loggedup():
                 cur = con.cursor()
                 cur.execute("SELECT * FROM users WHERE email=? AND password=?", (mail,pswd))
                 rows = cur.fetchall()
-                if len(rows)>=1: 
+                if len(rows)>=1:
+                    global mail_id 
                     mail_id=mail
                     return render_template("result_login.html",mail=mail,pswd=pswd)
 

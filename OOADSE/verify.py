@@ -8,6 +8,10 @@ cur.execute("SELECT * FROM users WHERE email=? AND password=?", ("v@gmail.com","
 
 rows = cur.fetchall()
 
+# cur.execute("delete from users")
+
+# con.commit()
+
 
 print(len(rows))
 for row in rows:
