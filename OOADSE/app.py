@@ -178,10 +178,13 @@ def event_added():
                 eventname = request.form['eventname']
                 startdate = request.form['startdate']
                 enddate = request.form['enddate']
+                option = request.form['reminder']
+                print(option)
                 res={}
                 res['title']=eventname
                 res['start']=startdate
                 res['end']=enddate
+                res['reminder']=option
                 filepath='./events/'+mail_id+'.json'
                 f=open(filepath,"r+")
                 j=json.loads(f.read())
