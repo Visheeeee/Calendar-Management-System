@@ -107,43 +107,8 @@ def login():
                     #t1.start()
                     flash('Successful logged in','success')
                     return render_template("result_login.html",mail=mail,pswd=pswd)
-    return render_template('login.html')
+    return render_template('login.html',form=form)
 
-
-
-
-
-
-
-
-
-@app.route("/loggedup",methods=["POST","GET"])
-def loggedup():
-  
-    if request.method == 'POST':
-        try:
-            mail = request.form['email']
-            pswd = request.form['password']
-            print(mail,pswd)
-
-            with sqlite3.connect("database.db") as  con:
-                print("inside table")
-                cur = con.cursor()
-                cur.execute("SELECT * FROM users WHERE email=? AND password=?", (mail,pswd))
-                rows = cur.fetchall()
-                if len(rows)>=1: 
-                    global mail_id
-                    mail_id=mail
-                    t1 = threading.Thread(target=send_mail, args=(mail_id,))
-                    t1.start()
-                    return render_template("result_login.html",mail=mail,pswd=pswd)
-
-        except:
-             
-             msg = "error in insert operation"
-      
-        finally:
-             con.close()
 
 
 
@@ -163,7 +128,7 @@ def dailyviews():
   c_yr=day.current_year
   c_wkday=day.current_weekday
   global mail_id
-  filepath='./events/'+'samarthgvashist2000@gmail.com'+'.json'
+  filepath='./events/'+mail_id+'.json'
   day.getevents(filepath)
   c_events=day.events
   print(c_events)
@@ -183,7 +148,7 @@ def weeklyviews():
   wk_start=day.curr_week_start
   wk_end=day.curr_week_end
   global mail_id
-  filepath='./events/'+'samarthgvashist2000@gmail.com'+'.json'
+  filepath='./events/'+mail_id+'.json'
   day.getevents(filepath)
   c_events=day.events
   print(c_events)
@@ -202,7 +167,7 @@ def monthlyviews():
   c_yr=day.current_year
   c_wkday=day.current_weekday
   global mail_id
-  filepath='./events/'+'samarthgvashist2000@gmail.com'+'.json'
+  filepath='./events/'+mail_id+'.json'
   day.getevents(filepath)
   c_events=day.events
   print(c_events)
