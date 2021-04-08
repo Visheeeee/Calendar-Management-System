@@ -1,7 +1,7 @@
 
 from flask import Flask, render_template, url_for, flash, redirect
 from flask import Flask, request, render_template, send_from_directory
-from forms import User, LoginForm,DailyView, WeeklyView, MonthlyView
+from forms import User, LoginForm,DailyView, WeeklyView, MonthlyView, Event
 import jinja2,os
 import os
 import datetime
@@ -61,27 +61,12 @@ def about():
 
 @app.route("/register", methods=["POST","GET"])
 def register():
-    form = User(request.form)
+    user = User(request.form)
     if request.method == 'POST':
-        nm=form.username.data
-        mail=form.email.data
-        pswd=form.password.data
-        print(nm)
-        with sqlite3.connect("database.db") as con:
-            print("inside table")
-            cur = con.cursor()
-            print('cur created')
-            cur.execute("INSERT INTO users (name,email,password) VALUES (?,?,?)",(nm,mail,pswd))
-            print('insertion')
-            con.commit()
-            msg = "Record successfully added"
-        file_path='./events/'+mail+'.json'
-        f = open(file_path, "w+")
-        f.write("[]")
-        f.close()
+        user.register()
         flash('Thanks for registering','success')
         return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+    return render_template('register.html', form=user)
 
          
 
@@ -90,24 +75,17 @@ def register():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    form = LoginForm(request.form)
+    user = LoginForm(request.form)
     if request.method == 'POST':
-        mail=form.email.data
-        pswd=form.password.data
-        with sqlite3.connect("database.db") as  con:
-                print("inside table")
-                cur = con.cursor()
-                cur.execute("SELECT * FROM users WHERE email=? AND password=?", (mail,pswd))
-                rows = cur.fetchall()
-                if len(rows)>=1: 
-                    global mail_id
-                    mail_id=mail  
-                    print(mail_id)
-                    #t1 = threading.Thread(target=send_mail, args=(mail_id,))
-                    #t1.start()
-                    flash('Successful logged in','success')
-                    return render_template("result_login.html",mail=mail,pswd=pswd)
-    return render_template('login.html',form=form)
+        if(user.login()): 
+            global mail_id
+            mail_id=user.email.data  
+            print(mail_id)
+            #t1 = threading.Thread(target=send_mail, args=(mail_id,))
+            #t1.start()
+            flash('Successful logged in','success')
+            return render_template("result_login.html",mail=user.email.data,pswd=user.password.data)
+    return render_template('login.html',form=user)
 
 
 
@@ -173,7 +151,7 @@ def monthlyviews():
   print(c_events)
   htmlcal = calendar.HTMLCalendar(calendar.MONDAY)
   calendar_code=htmlcal.formatmonth(c_yr,c_month_num)
-
+  del day
   return render_template('monthlyviews.html',day=c_day, month=c_month,year=c_yr,wkday=c_wkday,events=c_events,code=calendar_code)
 
 
@@ -183,7 +161,14 @@ def monthlyviews():
 
 @app.route("/addevent",methods=['GET','POST'])
 def addevent():
-    return render_template("new_event.html")
+    event = Event(request.form)
+    if request.method == 'POST':
+      global mail_id
+      event.add_event(mail_id)      
+      # return "sucess" # render a html file later
+      flash('Event Added','success')
+      return render_template("result_login.html",mail=mail_id)
+    return render_template("new_event.html", form=event)
 
 
 
@@ -191,7 +176,13 @@ def addevent():
 
 @app.route("/deleteevent",methods=['GET','POST'])
 def deleteevent():
-    return render_template("del_event.html")
+    event = Event(request.form)
+    if request.method == 'POST':
+      global mail_id
+      event.deleteevent(mail_id)
+      flash('Event Deleted restart the application','success')
+      return render_template("result_login.html",mail=mail_id)
+    return render_template("del_event.html",form=event)
 
 
 
@@ -215,31 +206,6 @@ def event_deleted():
                 return "sucess"
 
 
-
-
-
-@app.route("/event_added",methods=['GET','POST'])
-def event_added():
-                eventname = request.form['eventname']
-                startdate = request.form['startdate']
-                enddate = request.form['enddate']
-                option = request.form['reminder']
-                print(option)
-                res={}
-                res['title']=eventname
-                res['start']=startdate
-                res['end']=enddate
-                res['reminder']=option
-                filepath='./events/'+mail_id+'.json'
-                f=open(filepath,"r+")
-                j=json.loads(f.read())
-                f.seek(0)
-                f.truncate()
-                j.append(res)
-                print(j)
-                json.dump(j,f)
-                
-                return "sucess"
 
 
 
