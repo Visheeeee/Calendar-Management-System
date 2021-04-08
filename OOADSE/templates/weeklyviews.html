@@ -1,0 +1,73 @@
+{% extends "layout1.html" %}
+
+{% block content %}
+
+
+
+
+
+<table style="width:100%">
+    <tr>
+      <th>Fields</th>
+      <th>Values</th>
+    </tr>
+    <tr>
+      <td>Day</td>
+      <td>{{day}}</td>
+   
+    </tr>
+    <tr>
+      <td>Month</td>
+      <td>{{month}}</td>
+    </tr>
+    <tr>
+        <td>Year</td>
+        <td>{{year}}</td>
+      </tr>
+      <tr>
+        <td>Weekday</td>
+        <td>{{wkday}}</td>
+      </tr> 
+      <tr>
+        <td>Week Start Day</td>
+        <td>{{wk_start}}</td>
+      </tr> 
+      <tr>
+        <td>Week End Day</td>
+        <td>{{wk_end}}</td>
+      </tr> 
+      
+  </table>
+  
+  <br><br>
+
+
+Events
+
+
+
+<table style="width:100%">
+    <!-- Table headers -->
+        <th>
+            <tr style="color: green; ">  
+            <td>Event</td>
+            <td>Date</td>
+    </tr>
+        </th>
+
+    {%for event in events%}
+  
+    <!-- table rows -->
+    <tr>
+        <td>{{event[0]}}</td>
+        <td>{{event[1]}}</td>
+      
+    {%endfor%}
+      
+    </tr>
+      
+    </table>
+
+
+ 
+{% endblock content %}

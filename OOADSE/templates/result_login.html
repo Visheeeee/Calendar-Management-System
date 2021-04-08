@@ -1,13 +1,20 @@
-<html>
+{% extends "layout1.html" %}
 
-<body>
+{% block content %}
 
-    log in successful {{pswd}}   {{mail}}  
+
+    <h3>Successful Login</h3>
+    <p>
+    {{mail}}  
+    </p>    
+    <img class='avatar' src='static/pic.png' width="200" height="200">
 
     <a class="nav-item nav-link" href="{{ url_for('views') }}">Views</a>
     <a class="nav-item nav-link" href="{{ url_for('addevent') }}">Add event</a>
     <a class="nav-item nav-link" href="{{ url_for('deleteevent') }}">Delete event</a>
 
-</body> 
 
-</html>
+    
+
+
+{% endblock content %}

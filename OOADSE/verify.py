@@ -4,7 +4,7 @@ con = sqlite3.connect("database.db")
 
 cur = con.cursor()
 
-cur.execute("SELECT * FROM users WHERE email=? AND password=?", ("v@gmail.com","visheee"))
+cur.execute("SELECT * FROM users")
 
 rows = cur.fetchall()
 

@@ -1,7 +1,7 @@
 
 from flask import Flask, render_template, url_for, flash, redirect
 from flask import Flask, request, render_template, send_from_directory
-from forms import RegistrationForm, LoginForm
+from forms import User, LoginForm,DailyView, WeeklyView, MonthlyView
 import jinja2,os
 import os
 import datetime
@@ -21,12 +21,12 @@ conn = sqlite3.connect('database.db')
 print("Opened database successfully")
 
 
-conn.execute('CREATE TABLE IF NOT EXISTS users (name TEXT, email TEXT, password TEXT)')
+conn.execute('CREATE TABLE IF NOT EXISTS users (name TEXT, email TEXT, password TEXT, UNIQUE(name,email,password) ON CONFLICT IGNORE)') 
 print("Table connected successfully")
 conn.close()
 
 
-mail_id='v@gmail.com'
+mail_id=''
 
 
 app = Flask(__name__)
@@ -61,24 +61,13 @@ def about():
 
 @app.route("/register", methods=["POST","GET"])
 def register():
-    return render_template('default1.html')
-
-
-
-
-
-
-@app.route("/signedup",methods=["POST","GET"])
-def signedup():
-  
-   if request.method == 'POST':
-      try:
-         nm = request.form['fname']
-         mail = request.form['email']
-         pswd = request.form['password']
-         print(nm,mail,pswd)
-         
-         with sqlite3.connect("database.db") as con:
+    form = User(request.form)
+    if request.method == 'POST':
+        nm=form.username.data
+        mail=form.email.data
+        pswd=form.password.data
+        print(nm)
+        with sqlite3.connect("database.db") as con:
             print("inside table")
             cur = con.cursor()
             print('cur created')
@@ -86,19 +75,42 @@ def signedup():
             print('insertion')
             con.commit()
             msg = "Record successfully added"
-      except:
-         con.rollback()
-         msg = "error in insert operation"
-      
-      finally:
-         con.close() 
-         file_path='./events/'+mail+'.json'
-         f = open(file_path, "w+")
-         f.write("[]")
-         f.close()
-            
-         return render_template("result.html")
+        file_path='./events/'+mail+'.json'
+        f = open(file_path, "w+")
+        f.write("[]")
+        f.close()
+        flash('Thanks for registering','success')
+        return redirect(url_for('login'))
+    return render_template('register.html', form=form)
+
          
+
+
+
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    form = LoginForm(request.form)
+    if request.method == 'POST':
+        mail=form.email.data
+        pswd=form.password.data
+        with sqlite3.connect("database.db") as  con:
+                print("inside table")
+                cur = con.cursor()
+                cur.execute("SELECT * FROM users WHERE email=? AND password=?", (mail,pswd))
+                rows = cur.fetchall()
+                if len(rows)>=1: 
+                    global mail_id
+                    mail_id=mail  
+                    print(mail_id)
+                    #t1 = threading.Thread(target=send_mail, args=(mail_id,))
+                    #t1.start()
+                    flash('Successful logged in','success')
+                    return render_template("result_login.html",mail=mail,pswd=pswd)
+    return render_template('login.html')
+
+
+
 
 
 
@@ -138,7 +150,66 @@ def loggedup():
 
 @app.route("/views",methods=['GET','POST'])
 def views():
-    return render_template("json.html")
+  return render_template("views.html")
+
+
+
+@app.route("/dailyviews",methods=['GET','POST'])
+def dailyviews():
+  day=DailyView()
+  c_time=day.current_time
+  c_day=day.current_day
+  c_month=day.current_month
+  c_yr=day.current_year
+  c_wkday=day.current_weekday
+  global mail_id
+  filepath='./events/'+'samarthgvashist2000@gmail.com'+'.json'
+  day.getevents(filepath)
+  c_events=day.events
+  print(c_events)
+  return render_template('dailyviews.html',day=c_day, month=c_month,year=c_yr,wkday=c_wkday,events=c_events)
+
+
+
+
+@app.route("/weeklyviews",methods=['GET','POST'])
+def weeklyviews():
+  day=WeeklyView()
+  c_time=day.current_time
+  c_day=day.current_day
+  c_month=day.current_month
+  c_yr=day.current_year
+  c_wkday=day.current_weekday
+  wk_start=day.curr_week_start
+  wk_end=day.curr_week_end
+  global mail_id
+  filepath='./events/'+'samarthgvashist2000@gmail.com'+'.json'
+  day.getevents(filepath)
+  c_events=day.events
+  print(c_events)
+  return render_template('weeklyviews.html',day=c_day, month=c_month,year=c_yr,wkday=c_wkday,events=c_events,wk_start=wk_start,wk_end=wk_end)
+
+
+
+
+@app.route("/monthlyviews",methods=['GET','POST'])
+def monthlyviews():
+  day=MonthlyView()
+  c_time=day.current_time
+  c_day=day.current_day
+  c_month=day.current_month
+  c_month_num=day.current_month_number
+  c_yr=day.current_year
+  c_wkday=day.current_weekday
+  global mail_id
+  filepath='./events/'+'samarthgvashist2000@gmail.com'+'.json'
+  day.getevents(filepath)
+  c_events=day.events
+  print(c_events)
+  htmlcal = calendar.HTMLCalendar(calendar.MONDAY)
+  calendar_code=htmlcal.formatmonth(c_yr,c_month_num)
+
+  return render_template('monthlyviews.html',day=c_day, month=c_month,year=c_yr,wkday=c_wkday,events=c_events,code=calendar_code)
 
 
 
@@ -245,14 +316,6 @@ def return_data():
 
 
 
-
-
-
-@app.route("/login", methods=['GET', 'POST'])
-
-def login():
-
-    return render_template('login.html')
 
 
 
