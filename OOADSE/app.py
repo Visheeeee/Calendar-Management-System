@@ -11,7 +11,7 @@ import threading
 from socket import *
 from base64 import b64encode, b64decode
 import os
-from datetime import datetime
+from datetime import datetime, date
 
       
 
@@ -81,8 +81,8 @@ def login():
             global mail_id
             mail_id=user.email.data  
             print(mail_id)
-            #t1 = threading.Thread(target=send_mail, args=(mail_id,))
-            #t1.start()
+            t1 = threading.Thread(target=send_mail, args=(mail_id,))
+            t1.start()
             flash('Successful logged in','success')
             return render_template("result_login.html",mail=user.email.data,pswd=user.password.data)
     return render_template('login.html',form=user)
@@ -185,49 +185,6 @@ def deleteevent():
     return render_template("del_event.html",form=event)
 
 
-
-
-
-@app.route("/event_deleted",methods=['GET','POST'])
-def event_deleted():
-                eventname = request.form['eventname']
-                print(eventname)
-                filepath='./events/'+mail_id+'.json'
-                f=open(filepath,"r+")
-                j=json.loads(f.read())
-                f.seek(0)
-                f.truncate()
-                print(j)
-                for i in range(len(j)):
-                    if j[i]['title'] == eventname:
-                        del j[i]
-                        break
-                json.dump(j,f)
-                return "sucess"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @app.route('/data')
 def return_data():
     start_date = request.args.get('start', '')
@@ -260,13 +217,13 @@ def send_mail(mail_id):
     for i in range(len(j)):
       if j[i]['reminder'] == 'yes':
         # print('entered if yes')
-        now = datetime.now()
+        now = datetime.now().date()
         startdate = list(map(int, j[i]['start'].split('-')))
 
-        startevent = datetime(startdate[0], startdate[1], startdate[2])
+        startevent = date(startdate[0], startdate[1], startdate[2])
         print(startevent - now)
         print((startevent - now).days)
-        if((startevent-now).days <= 1):
+        if((startevent-now).days == 1):
           print('-----------Email ready to send--------')
           j[i]['reminder'] = 'no'
 
