@@ -131,7 +131,10 @@ class MonthlyView(FlaskForm):
 
     def getevents(self, filepath):
         f=open(filepath,"r")
+        # print(f.read())
         j=json.loads(f.read())
+        print(j)
+        self.events=[]
         for i in range(len(j)):
             startdate = list(map(int, j[i]['start'].split('-')))
             startevent = date(startdate[0], startdate[1], startdate[2])
@@ -145,10 +148,6 @@ class MonthlyView(FlaskForm):
 	                self.events.append([j[i]['title'],j[i]['start']])
         f.flush()
         f.close()
-    
-    def __del__(self):
-        print('Destructor called, Employee deleted.')
-
 
         
 

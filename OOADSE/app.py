@@ -39,7 +39,7 @@ APP_ROOT = os.path.dirname(os.path.abspath("__file__"))
 
 @app.route("/home")
 def home():
-    flash('Welcome to Calender', 'success')
+    flash('Welcome to Calendar', 'success')
     return render_template('home.html')
 
 
@@ -180,7 +180,7 @@ def deleteevent():
     if request.method == 'POST':
       global mail_id
       event.deleteevent(mail_id)
-      flash('Event Deleted restart the application','success')
+      flash('Event Deleted','success')
       return render_template("result_login.html",mail=mail_id)
     return render_template("del_event.html",form=event)
 
