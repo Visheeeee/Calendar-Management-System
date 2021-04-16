@@ -185,26 +185,6 @@ def deleteevent():
     return render_template("del_event.html",form=event)
 
 
-@app.route('/data')
-def return_data():
-    start_date = request.args.get('start', '')
-    end_date = request.args.get('end', '')
-    # You'd normally use the variables above to limit the data returned
-    # you don't want to return ALL events like in this code
-    # but since no db or any real storage is implemented I'm just
-    # returning data from a text file that contains json elements
-    filepath='./events/'+mail_id+'.json'
-    print(mail_id)
-    with open(filepath, "r") as input_data:
-        # you should use something else here than just plaintext
-        # check out jsonfiy method or the built in json module
-        # http://flask.pocoo.org/docs/0.10/api/#module-flask.json
-        
-        return input_data.read()
-
-
-
-
 
 
 def send_mail(mail_id):
@@ -317,7 +297,7 @@ def send_mail(mail_id):
             print('354 reply not received from server.')
 
           # Send message data.
-          clientSocket.send('SUBJECT: Event Remainder!\r\n'.encode())
+          clientSocket.send('SUBJECT: Event Reminder!\r\n'.encode())
           email_msg = j[i]['title'] + ' is scheduled tomorrow'
           clientSocket.send(email_msg.encode())
 

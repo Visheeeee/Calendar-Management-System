@@ -72,6 +72,7 @@ class DailyView(FlaskForm):
     def getevents(self, filepath):
         f=open(filepath,"r")
         j=json.loads(f.read())
+        self.events=[]
         for i in range(len(j)):
             startdate = list(map(int, j[i]['start'].split('-')))
             startevent = date(startdate[0], startdate[1], startdate[2])
@@ -100,6 +101,7 @@ class WeeklyView(FlaskForm):
     def getevents(self, filepath):
         f=open(filepath,"r")
         j=json.loads(f.read())
+        self.events=[]
         for i in range(len(j)):
             startdate = list(map(int, j[i]['start'].split('-')))
             startevent = date(startdate[0], startdate[1], startdate[2])
@@ -158,7 +160,7 @@ class Event(FlaskForm):
     eventname = StringField('Eventname', validators=[DataRequired(), Length(min=2, max=20)])
     startdate = StringField('Startdate', validators=[DataRequired(), Length(min=2, max=20)])
     enddate = StringField('Enddate', validators=[DataRequired(), Length(min=2, max=20)])
-    option = RadioField('option', choices = ['yes', 'no'])
+    option = RadioField('Reminder', choices = ['yes', 'no'])
 
     def has_reminder(self):
         if self.option.data == 'yes':
