@@ -11,7 +11,7 @@ import threading
 from socket import *
 from base64 import b64encode, b64decode
 import os
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
       
 
@@ -106,11 +106,35 @@ def dailyviews():
   c_yr=day.current_year
   c_wkday=day.current_weekday
   global mail_id
-  filepath='./events/'+mail_id+'.json'
+  filepath='./users/'+mail_id+'.json'
   day.getevents(filepath)
   c_events=day.events
   print(c_events)
   return render_template('dailyviews.html',day=c_day, month=c_month,year=c_yr,wkday=c_wkday,events=c_events)
+
+
+prev_day_count = 0
+@app.route("/prevdayview", methods=['GET, POST'])
+def get_prev_day():
+  if request.method == "POST":
+    prev_day_count += 1
+    day=DailyView()
+    p_day=day.current_day - timedelta(prev_day_count)
+    day.current_day = p_day
+    p_month=p_day.strftime("%B")
+    day.current_month = p_month
+    p_yr=p_day.year
+    day.current_year = p_yr
+    p_wkday=p_day.strftime("%A")
+    day.current_weekday = p_wkday
+    global mail_id
+    filepath='./users/'+mail_id+'.json'
+    day.getevents(filepath)
+    p_events=day.events
+    print(p_events)
+    return render_template('dailyviews.html',day=p_day, month=p_month,year=p_yr,wkday=p_wkday,events=p_events)
+
+
 
 
 
@@ -126,7 +150,7 @@ def weeklyviews():
   wk_start=day.curr_week_start
   wk_end=day.curr_week_end
   global mail_id
-  filepath='./events/'+mail_id+'.json'
+  filepath='./users/'+mail_id+'.json'
   day.getevents(filepath)
   c_events=day.events
   print(c_events)
@@ -145,7 +169,7 @@ def monthlyviews():
   c_yr=day.current_year
   c_wkday=day.current_weekday
   global mail_id
-  filepath='./events/'+mail_id+'.json'
+  filepath='./users/'+mail_id+'.json'
   day.getevents(filepath)
   c_events=day.events
   print(c_events)
@@ -189,9 +213,10 @@ def deleteevent():
 
 def send_mail(mail_id):
   # print('mail func started')
-  while(True):
+  while(1):
 
-    f = open('./events/' + mail_id + '.json', 'r+')
+
+    f = open('./users/' + mail_id + '.json', 'r+')
     j = json.loads(f.read())
 
     for i in range(len(j)):
@@ -210,8 +235,8 @@ def send_mail(mail_id):
           endmsg = '\r\n.\r\n'
 
           # Sender - email, password and Receiver - email DETAILS
-          sender_email = 'navaneethmukund.nm@gmail.com'
-          sender_password = 'navaneeth123'
+          sender_email = ''
+          sender_password = ''
           receiver_email = mail_id
           # Encoding sender email and password in base64 format
           encoded_sender_email = b64encode(sender_email.encode('ascii'))

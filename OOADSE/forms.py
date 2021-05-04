@@ -26,7 +26,7 @@ class User(FlaskForm):
             print('insertion')
             con.commit()
             msg = "Record successfully added"
-        file_path='./events/'+self.email.data+'.json'
+        file_path='./users/'+self.email.data+'.json'
         f = open(file_path, "w+")
         f.write("[]")
         f.close()
@@ -178,7 +178,7 @@ class Event(FlaskForm):
         res['start']=startdate
         res['end']=enddate
         res['reminder']=option
-        filepath='./events/'+mail_id+'.json'
+        filepath='./users/'+mail_id+'.json'
         f=open(filepath,"r+")
         j=json.loads(f.read())
         f.seek(0)
@@ -192,7 +192,7 @@ class Event(FlaskForm):
     
     def deleteevent(self,mail_id):
         eventname = self.eventname.data
-        filepath='./events/'+mail_id+'.json'
+        filepath='./users/'+mail_id+'.json'
         f=open(filepath,"r+")
         j=json.loads(f.read())
         f.seek(0)
